@@ -11,7 +11,7 @@
 # for SynthMorph, and you can specify paths relative to it.
 
 # Update the version to pull a different image, unless you already have it.
-version = 3
+version = 4
 
 # Local image location for Apptainer/Singularity. Set an absolute path to avoid
 # pulling new images when you change the folder. Ignored for Docker and Podman.

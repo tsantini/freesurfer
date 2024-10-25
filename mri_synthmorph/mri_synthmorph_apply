@@ -187,6 +187,12 @@ Website: https://synthmorph.io
 doc += textwrap.indent(ref, prefix=' ' * 8)
 
 
+print(rewrap((
+    f'Warning: {prog} is deprecated in favor of `mri_synthmorph apply` and '
+    'will be removed in the future.'
+)))
+
+
 # Arguments.
 p = argparse.ArgumentParser(add_help=False)
 p.add_argument('trans')
