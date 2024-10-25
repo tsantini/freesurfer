@@ -13,6 +13,10 @@ umask 002;
 
 setenv FS_RECON_VERSION '@FS_VERSION@ (@BUILD_STAMP@)'
 
+# This turns on the V8 options
+if($?FS_V8_XOPTS == 0) setenv FS_V8_XOPTS 1
+set UseV8 = $FS_V8_XOPTS;
+
 set ProgName = `basename $0`;
 set inputargs = ($argv);
 set subjid = ();
@@ -76,9 +80,6 @@ set DoSuperClean = 0;
 set DoShowEdits  = 0;
 
 set InputList = ();
-
-if($?FS_V8_XOPTS == 0) setenv FS_V8_XOPTS 0
-set UseV8 = $FS_V8_XOPTS;
 
 # parameter defaults (most can be overriden with flags)
 set XOptsFile = ();
@@ -420,10 +421,12 @@ source $FREESURFER_HOME/sources.csh
 foreach arg ($argv)
   switch($arg)
     case "-v8": 
+    case "--v8": 
       set UseV8 = 1
       setenv FS_V8_XOPTS 1
       breaksw;
     case "-no-v8": 
+    case "--no-v8": 
       set UseV8 = 0
       setenv FS_V8_XOPTS 0
       breaksw;
@@ -6066,12 +6069,14 @@ while( $#argv != 0 )
 
   switch($flag)
 
-    # Note: these two are parsed at the begining
+    # Note: these two are parsed at the beginning and can also be controlled by FS_V8_XOPTS
     case "-v8": 
+    case "--v8": 
       set UseV8 = 1
       setenv FS_V8_XOPTS 1
       breaksw;
     case "-no-v8": 
+    case "--no-v8": 
       set UseV8 = 0
       setenv FS_V8_XOPTS 0
       breaksw;
