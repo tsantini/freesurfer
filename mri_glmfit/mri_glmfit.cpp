@@ -748,6 +748,7 @@ double MRTM2_k2p=0, Logan_Tstar=0;
 MATRIX *MRTM2_x1;
 int BPClipNeg=0;
 double BPClipMax=-1;
+int DoFDR=0; // for simulations
 
 int nRandExclude=0,  *ExcludeFrames=NULL, nExclude=0;
 char *ExcludeFrameFile=NULL;
@@ -1911,19 +1912,25 @@ int main(int argc, char **argv) {
 	    }
 	    if(mriglm->mask) MRImask(sig,mriglm->mask,sig,0.0,0.0);
 
+	    double vwth=threshadj;
+	    if(DoFDR){
+	      // Set voxel-wise thresh with FDR here. threshadj is interpeted as -log10(fdr)
+	      int framelist[1]={0};
+	      double fdr = pow(10,-threshadj); // Convert to p-value
+	      MRIfdr2vwth(&sig,1,framelist,fdr,csd->threshsign,1,&mriglm->mask,&vwth,NULL,0);
+	      if(debug) printf("fdr=%g sign=%g vwth=%g\n",fdr,csd->threshsign,vwth);
+	    }
 	    if(surf) {
 	      // surface clustering -------------
 	      MRIScopyMRI(surf, sig, 0, "val");
-	      if(debug || Gdiag_no > 0) printf("Clustering on surface %lf\n",
-					       mytimer.seconds());
-	      SurfClustList = sclustMapSurfClusters(surf,threshadj,-1,csd->threshsign,
-						    0,&nClusters,NULL,fwhmmap);
+	      if(debug || Gdiag_no > 0) printf("Clustering on surface %lf\n", mytimer.seconds());
+	      SurfClustList = sclustMapSurfClusters(surf,vwth,-1,csd->threshsign,0,&nClusters,NULL,fwhmmap);
 	      csize = sclustMaxClusterArea(SurfClustList, nClusters);
 	    } 
 	    else {
 	      // volume clustering -------------
 	      if (debug) printf("Clustering on volume\n");
-	      VolClustList = clustGetClusters(sig, 0, threshadj,-1,csd->threshsign,0,
+	      VolClustList = clustGetClusters(sig, 0, vwth,-1,csd->threshsign,0,
 					      mriglm->mask, &nClusters, NULL);
 	      csize = voxelsize*clustMaxClusterCount(VolClustList,nClusters);
 	      if (Gdiag_no > 0) clustDumpSummary(stdout,VolClustList,nClusters);
@@ -1965,6 +1972,7 @@ int main(int argc, char **argv) {
 	    fprintf(fp,"# num_dof %d\n",mriglm->glm->C[n]->rows);
 	    fprintf(fp,"# den_dof %g\n",mriglm->glm->dof);
 	    fprintf(fp,"# SmoothLevel %g\n",SmoothLevel);
+	    fprintf(fp,"# DoFDR %d\n",DoFDR);
 	    csd->nreps = nthsim+1;
 	    csd->nClusters[nthsim] = nClusters;
 	    csd->MaxClusterSize[nthsim] = csize;
@@ -2637,6 +2645,7 @@ static int parse_commandline(int argc, char **argv) {
     else if (!strcasecmp(option, "--w-inv"))  weightinv = 1;
     else if (!strcasecmp(option, "--w-sqrt")) weightsqrt = 1;
     else if (!strcasecmp(option, "--perm-1")) OneSamplePerm = 1;
+    else if (!strcasecmp(option, "--fdr")) DoFDR = 1;
     else if (!strcasecmp(option, "--osgm"))   {OneSampleGroupMean = 1; DoPCC = 0;}
     else if (!strcasecmp(option, "--diag-cluster")) DiagCluster = 1;
     else if (!strcasecmp(option, "--perm-force")) PermForce = 1;

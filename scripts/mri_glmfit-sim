@@ -9,6 +9,7 @@ set nulltype = ();
 set nsim = ()
 set thresh = ()
 set csdbase = ()
+set csdbaseset = 0
 set simsign = ()
 set cwpvalthresh = .05
 set Overwrite = 0;
@@ -46,6 +47,7 @@ set Do1D = 0;
 set varfwhm = ()
 set PermPVROverride = 0;
 set mask = ();
+set DoFDR = 0;
 
 set nJobs = 1;
 set DoBackground = 0;
@@ -299,11 +301,10 @@ if(0 && $UseGRF && $anattype != volume) then
   echo "ERROR: can only use --grf with volume"
   exit 1;
 endif
-if($UseGRF) then
-  set csdbase = "grf.th$thresh.$simsign"
-  #set tmp = `echo "$thresh*10"|bc -l`
-  #set tmp = `printf %02d $tmp`
-  #set csdbase = "grf.th$tmp.$simsign"
+
+if($UseGRF && $csdbaseset == 0) set csdbase = "grf.th$thresh.$simsign"
+if($DoFDR && $csdbaseset == 0) then
+  set csdbase = $csdbase.fdr
 endif
 
 if($#subjectOverride) set subject = $subjectOverride
@@ -474,6 +475,7 @@ if($DoSim) then
       if($PermNonStatCor) set cmd = ($cmd --perm-nonstatcor)
     endif
     if($PermPVROverride)  set cmd = ($cmd --perm-pvr-override)
+    if($DoFDR)            set cmd = ($cmd --fdr)
     if($UseTable)   set cmd = ($cmd --table $y)
     #if($#label) set cmd = ($cmd --label $label)
     if($PermForce) set cmd = ($cmd --perm-force)
@@ -637,7 +639,8 @@ foreach conname ($conlist)
       --annot $annot --cwpvalthresh $cwpvalthresh --o $msig --no-fixmni)
     set cmd = ($cmd --csd-out $glmdir/csd/all.$csdbase-$conname.csd)
     if(! $UseGRF) set cmd = ($cmd $csdlist --csdpdf $csdpdf --vwsig $vwsig --vwsigmax $vwsigmax)
-    if($UseGRF)   set cmd = ($cmd --fwhm $fwhm --hemi $hemi --subject $subject --thmin $thresh --sign $simsign)
+    if($UseGRF)   set cmd = ($cmd --fwhm $fwhm --hemi $hemi --subject $subject --sign $simsign --thmin $thresh )
+    if($DoFDR) set cmd = ($cmd --fdr-log10 $thresh)
     if($PermNonStatCor) set cmd = ($cmd --fwhm-map $fwhmmap)
     if($OutputAnnot) set cmd = ($cmd --oannot $oannot)
     if($Bonferroni) set cmd = ($cmd --bonferroni $Bonferroni)
@@ -848,6 +851,10 @@ while( $#argv != 0 )
       set simsign = $argv[1]; shift;
       breaksw
 
+    case "--fdr":
+      set DoFDR = 1;
+      breaksw
+
     case "--subject-override":
       if( $#argv < 1) goto arg1err;
       set subjectOverride = $argv[1]; shift;
@@ -970,11 +977,13 @@ while( $#argv != 0 )
     case "--base":
       if($#argv < 1) goto arg1err;
       set csdbase = $argv[1]; shift;
+      set csdbaseset = 1
       breaksw
 
     case "--no-sim":
       if($#argv < 1) goto arg1err;
       set csdbase = $argv[1]; shift;
+      set csdbaseset = 1
       set DoSim = 0;
       breaksw
 

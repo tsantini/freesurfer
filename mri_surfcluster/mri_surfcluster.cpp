@@ -854,11 +854,19 @@ static int parse_commandline(int argc, char **argv) {
       if (nargc < 1) argnerr(option,1);
       csdpdffile = pargv[0];
       nargsused = 1;
-    } else if (!strcmp(option, "--fdr")) {
+    } 
+    else if (!strcmp(option, "--fdr")) {
       if (nargc < 1) argnerr(option,1);
       sscanf(pargv[0],"%lf",&fdr);
       nargsused = 1;
-    } else if (!strcmp(option, "--thmin")) {
+    } 
+    else if (!strcmp(option, "--fdr-log10")) {
+      if (nargc < 1) argnerr(option,1);
+      sscanf(pargv[0],"%lf",&fdr);
+      fdr = pow(10,-fdr);
+      nargsused = 1;
+    } 
+    else if (!strcmp(option, "--thmin")) {
       if (nargc < 1) argnerr(option,1);
       sscanf(pargv[0],"%lf",&thmin);
       if (thmin < 0) {
@@ -1064,6 +1072,7 @@ static void print_usage(void) {
   printf("   --sign   sign      : <abs> or pos/neg for one-sided tests\n");
   printf("   --no-adjust  : do not adjust thresh for one-tailed tests\n");
   printf("   --fdr FDR  : set thmin with False Discovery Rate\n");
+  printf("   --fdr-log10 FDR  : set thmin with False Discovery Rate, FDR = pow(10,-FDR)\n");
   printf("\n");
   printf("   --subject  subjid    : source surface subject (can be ico)\n");
   printf("   --hemi hemi          : lh or rh \n");

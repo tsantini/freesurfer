@@ -65,7 +65,7 @@ MRI *mri_reshape(MRI *vol, int ncols, int nrows, int nslices, int nframes);
 MRI *MRIreshape1d(MRI *src, MRI *trg);
 
 int MRIfdr2vwth(MRI **vollist, int nvols, int *framelist, double fdr, int signid,
-                int log10flag, MRI **masklist, double *vwth, MRI **ovollist);
+                int log10flag, MRI **masklist, double *vwth, MRI **ovollist, int debug=1);
 int MRIdimMismatch( const MRI *v1, const MRI *v2, int frameflag);
 MATRIX *MRIcovarianceMatrix(MRI *mri, MRI *mask);
 int MRIpca(MRI *D, MATRIX **pU, VECTOR **pS, MRI **pV, MRI *mask);

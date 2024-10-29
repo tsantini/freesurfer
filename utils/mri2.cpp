@@ -1407,7 +1407,7 @@ int MRIfdr2vwth(MRI **vollist,
                 int log10flag,
                 MRI **masklist,
                 double *vwth,
-                MRI **ovollist)
+                MRI **ovollist, int debug)
 {
   MRI *vol, *mask, *ovol;
   double *p = NULL, val = 0.0, valnull = 0.0, maskval;
@@ -1466,7 +1466,7 @@ int MRIfdr2vwth(MRI **vollist,
             if (maskval < 0.5) continue;
           }
           val = MRIFseq_vox(vol, c, r, s, frame);
-
+	  //printf("%d  %g\n",c,val);
           // Check the sign
           if (signid == -1 && val > 0) continue;
           if (signid == +1 && val < 0) continue;
@@ -1481,7 +1481,7 @@ int MRIfdr2vwth(MRI **vollist,
       }
     }
   }
-  printf("MRIfdr2vwth: np = %d, nv = %d\n", np, Nv);
+  if(debug) printf("MRIfdr2vwth: np = %d, nv = %d  sign=%d\n", np, Nv,signid);
 
   // Check that something met the match criteria,
   // otherwise return an error
@@ -1493,7 +1493,7 @@ int MRIfdr2vwth(MRI **vollist,
 
   // Compute the voxel-wise threshold using FDR
   *vwth = fdr2vwth(p, np, fdr);
-  printf("MRIfdr2vwth: vwth = %lf, log10(vwhth) = %lf\n", *vwth, -log10(*vwth));
+  if(debug) printf("MRIfdr2vwth: vwth = %lf, log10(vwhth) = %lf\n", *vwth, -log10(*vwth));
   free(p);
 
   if (ovollist == NULL) {
