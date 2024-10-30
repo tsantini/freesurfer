@@ -12089,7 +12089,8 @@ MRI *MRIresampleFill(MRI *src, MRI *template_vol, int resample_type, float fill_
     MatrixPrint(stdout, m);
   }
 
-  int nframes_target = 1; // the target volume will have only one frame
+  // the dest can't have more frames than the src, or the program will crash
+  int nframes_target = (src->nframes <= template_vol->nframes) ? src->nframes : template_vol->nframes;
   dest = MRIallocSequence(
 			  template_vol->width, template_vol->height, template_vol->depth, src->type, nframes_target);
   if (dest == NULL) return (NULL);
