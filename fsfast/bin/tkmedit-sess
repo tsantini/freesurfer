@@ -35,7 +35,9 @@ set ShowOverlay = 1;
 set ShowSurfs = 0;
 set ToSelf = 0; # show tal on subjects anatomy
 set RegDOF = 6;
+set UseB0DC = 0;
 set regfile = ();
+set resample = trilinear
 
 if($?FSF_USE_FV == 0) setenv FSF_USE_FV 1
 set UseFreeview = $FSF_USE_FV
@@ -94,12 +96,18 @@ if($#analysis != 0) then
   set UseTalairach = `getana -a $analysis -t IsMNI305`;
   set UseCVS = `getana -a $analysis -t IsCVS`;
   set IsFIR = `getana -a $analysis -t IsFIR`;
+  set UseB0DC = `getana -a $analysis -t UseB0DC`;
 else if($#flac) then
   set fsd = `cat $flac | awk '{if($1 == "fsd") print $2}'`
   set analysis = `basename $flac .flac`
   echo $analysis $fsd
   set ShowHdr = 0;
 endif
+
+set b0dcstr = ""
+if($UseB0DC) set b0dcstr = .b0dc
+if($#regfile == 0) set regfile = register.dof$RegDOF$b0dcstr.lta
+
 
 ## Parse the map analysis
 if($#mapanalysis != 0) then
@@ -265,7 +273,7 @@ else
   if($#segvol) set cmd = ($cmd -v "$mdir/$segvol":"lut=$segcolor":"opacity=$segopacity":"colormap=lut")
   if($#mapconcatfile) then
     set fmid = `echo "($fthresh+$fmax)/2"|bc -l`
-    set fvopt = ($mapconcatfile":"colormap=heat":"heatscale=$fthresh,$fmid,$fmax)
+    set fvopt = ($mapconcatfile":"colormap=heat":"heatscale=$fthresh,$fmid,${fmax}:resample=$resample)
     if($#regfile) set fvopt = ($fvopt":"reg=$regfile)
     set cmd = ($cmd -v $fvopt -viewport coronal -colorscale)
   endif
@@ -438,6 +446,16 @@ while( $#argv != 0 )
       set UseFreeview = 1;
       breaksw
 
+    case "-nearest":
+      set resample = nearest
+      breaksw
+    case "-trilinear":
+      set resample = trilinear
+      breaksw
+    case "-cubic":
+      set resample = cubic
+      breaksw
+
     case "-vgl":
       setenv FS_ALLOW_VGLRUN 1
       breaksw
@@ -535,8 +553,6 @@ check_params:
     exit 1;
   endif
 
-  if($#regfile == 0) set regfile = register.dof$RegDOF.lta
-
 goto check_params_return;
 ############--------------##################
 
@@ -569,6 +585,7 @@ usage_exit:
   echo "   -segopacity opacity : between 0 and 1 (def .3)"
   echo "   -fthresh fthresh : threshold for color overlay"
   echo "   -fmax    fmax    : saturation threshold for color overlay"
+  echo "   -nearest, -trilinear, -cubic : interpolation (default is $resmaple)"
   echo "   -tcl script.tcl  : run tkmedit with tcl script"
   echo "   -freeview : display with freeview (cannot display HRFs)"
   echo "   -tkmedit  : display with tkmedit"
