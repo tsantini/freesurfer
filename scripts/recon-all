@@ -8310,7 +8310,8 @@ check_params:
       exit 1
     endif
 
-    if($TopoFitLevel >= 1 || $UseSynthSeg || $JosaReg) then
+
+    if($TopoFitLevel >= 1 || $JosaReg) then
       if($?FS_ALLOW_DEEP == 0) setenv FS_ALLOW_DEEP 0
       if(! $FS_ALLOW_DEEP) then
         echo "ERROR: cannot use ML routines"
