@@ -24,11 +24,11 @@ This code requires a modern version of FreeSurfer (7.4.0 or newer), which must b
 The first time you run the method, it will prompt you to download the atlas files, which are not distributed with the code.
 
 
-## Usage:
+## Usage for 'full' Bayesian version (slow):
 
 To run the code, please use the script segment.sh as follows:
 
-segment.sh INPUT_SCAN OUTPUT_DIRECTORY ATLAS_MODE GPU THREADS [BF_MODE] [GMM_MODE]
+mri_histo_atlas_segment INPUT_SCAN OUTPUT_DIRECTORY ATLAS_MODE GPU THREADS [BF_MODE] [GMM_MODE]
 
 - INPUT SCAN: scan to process, in nii(.gz) or mgz format
 - OUTPUT_DIRECTORY: directory where segmentations, volume files, etc will be written (more on this below).
@@ -75,8 +75,20 @@ You can visualize the output by CDing into the results directory and running the
 
 freeview -v bf_corrected.mgz -v seg_left.mgz:colormap=lut:lut=lookup_table.txt -v seg_right.mgz:colormap=lut:lut=lookup_table.txt
  
+## Alternative 'fast' version:
 
+We also distribute a fast version, where the atlas deformation is pre-computed with a neural network,
+and then kept constant during the optimization, such that we only need to run the EM algorithm once for
+the Gaussian parameters and that is it.
 
+mri_histo_atlas_segment_fast INPUT_SCAN OUTPUT_DIRECTORY GPU THREADS [BF_MODE]
+
+The options are similar to mri_histo_atlas_segment, but the atlas and gmm modes are always 'simplified' and '1mm', respectively. 
+The output files in the output directory follow the same convention.
+
+This faster version is particularly useful if you are running the code on the CPU rather than CPU. 
+On a semi-modern desktop, the run time should be less than an hour (note that it segments both 
+hemispheres in a single run, as opposed to the full Bayesian version).
 
 
 
