@@ -2021,6 +2021,10 @@ int SegDice::ComputeDice()
     int r,s;
     for(r=0; r < seg1->height; r++){
       for(s=0; s < seg1->depth; s++){
+	if(mask){
+	  double v = MRIgetVoxVal(mask,c,r,s,0);
+	  if(v < 0.5) continue;
+	}
 	std::vector<int>::iterator ind1, ind2;
 	int k1=0, k2=0;
 	int v1 = MRIgetVoxVal(seg1,c,r,s,0);

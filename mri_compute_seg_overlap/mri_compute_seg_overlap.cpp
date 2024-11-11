@@ -115,6 +115,7 @@ int all_labels_of_interest[MAX_CLASSES];
 COLOR_TABLE *ctab=NULL;
 char *table_fname;
 FILE *tablefp;
+SegDice sd; // For use with -dice stand-alone
 
 int main(int argc, char *argv[])
 {
@@ -487,7 +488,13 @@ static int get_option(int argc, char *argv[])
     ctab = CTABreadASCII(tmpstr);
     printf("Using ctab %s\n",tmpstr);
   }
-  else if (!stricmp(option, "dice")){
+  else if (!stricmp(option, "dice-mask")){ // -dice-mask
+    // Must go before -dice
+    sd.mask = MRIread(argv[2]);
+    if(sd.mask==NULL) exit(1);
+    nargs = 1;
+  }
+  else if (!stricmp(option, "dice")){ // -dice
     // Stand-alone method to compute dice. Has  more flexibility
     // 7: seg1 seg2 ctab ReportEmpty01 ExcludeId datfile tablefile
     // seg1 - first segmentation (for fdr and tdr, this is ground truth)
@@ -498,7 +505,6 @@ static int get_option(int argc, char *argv[])
     // datfile - save the dice for each seg on a single line without anymore info
     // tablefile - save as a table with each seg on a row followed by 
     //   count1 count2 dice tpr fdr jaccard
-    SegDice sd;
     sd.seg1 = MRIread(argv[2]);
     if(sd.seg1==NULL) exit(1);
     sd.seg2 = MRIread(argv[3]);

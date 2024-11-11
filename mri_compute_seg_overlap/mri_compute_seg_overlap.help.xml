@@ -77,6 +77,8 @@
 	  labels from all calculation</explanation>
       <argument>-all_labels</argument>
       <explanation>check all labels</explanation>
+      <argument>-dice-mask mask</argument>
+      <explanation>Mask to use with -dice. Must come before -dice</explanation>
       <argument>-dice seg1 seg2 ctab ReportEmpty01 ExcludeId datfile tablefile</argument>
       <explanation>Standalone way to compute dice. ctab can = embedded. output = count1 count2 dice tpr fdr jaccard</explanation>
       <argument>-tpfpfn outvol manseg autoseg segid1 ... segidN</argument>

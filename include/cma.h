@@ -738,6 +738,7 @@ int Seg2NbrNonBrainWrapper(char *subject, char *segname, COLOR_TABLE *ctab, char
 class SegDice {
 public:
   MRI *seg1=NULL, *seg2=NULL; // for TPR and FDR, seg1=true, seg2=test
+  MRI *mask=NULL;
   COLOR_TABLE *ctab=NULL;
   std::vector<int> seglist;
   char *seg1file=NULL, *seg2file=NULL;
