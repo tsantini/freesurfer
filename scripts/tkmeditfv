@@ -51,6 +51,7 @@ set mainmax = ()
 set annotlist = ()
 set DoManCheck = 0
 set DoCDMRI = 0;
+set HideIn3D = 0
 set overlaymethod = "mid_to_min"
 if($?FV_PATIENT_ORIENTATION == 0) setenv FV_PATIENT_ORIENTATION 1
 if($?FV_ROTATE_AROUND_CURSOR == 0) setenv FV_ROTATE_AROUND_CURSOR 0
@@ -177,7 +178,7 @@ if(! $UseTkMedit) then
         endif
       endif
     end
-    set cmd = ($cmd --surface $surf":"edgecolor=$surfcolor[$nth]$ov$annotarg)
+    set cmd = ($cmd --surface $surf":"edgecolor=$surfcolor[$nth]$ov${annotarg}:hide_in_3d=$HideIn3D)
   end
   if($#CursorCRS) set cmd = ($cmd -slice $CursorCRS)
   if($CenterCursor) set cmd = ($cmd -cc)
@@ -627,6 +628,12 @@ while( $#argv != 0 )
       set UseTkMedit = 1;
       breaksw
 
+    case "-hide":
+    case "-hide-3d":
+    case "-hide-in-3d":
+      set HideIn3D = 1;
+      breaksw
+
     case "-vgl":
       setenv FS_ALLOW_VGLRUN 1
       breaksw
@@ -887,6 +894,7 @@ usage_exit:
   echo "-defectps : load defect pointset (also loaded with -defects)"
   echo "-trilin : use trilinear interpolation for volume overlays"
   echo "-neuro : use neurological orientation instead of radiological"
+  echo "-hide : hide surfaces in 3D"
   echo "-rotate-around-cursor (-rca) : in 3d view, rotate around cursor (use -no- to turn off)"
   #echo "-linear, -linearopaque, -piecewise, -min_to_max (default) : overlay heat scale"
   echo "--keep-sphere-vol-geom : do not ignore sphere volume geometry when loading sphere"
