@@ -316,7 +316,7 @@ if(! $ForceUpdate) then
   set ud = `UpdateNeeded $segvolcc $segvol $normvol`
   if(! $ud) then
     echo "  seg2cc: update not needed. Run with --force-update to force an update"
-    exit 1
+    exit 0
   endif
 endif
 
