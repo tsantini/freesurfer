@@ -418,7 +418,12 @@ while( $#argv != 0 )
       breaksw
 
     case "-trilin":
-      set interp = trilin
+    case "-trilinear":
+      set interp = trilinear
+      breaksw
+
+    case "-cubic":
+      set interp = cubic
       breaksw
 
     case "-timecourse":
@@ -893,6 +898,7 @@ usage_exit:
   echo "-defects : load info needed to evaluate defects"
   echo "-defectps : load defect pointset (also loaded with -defects)"
   echo "-trilin : use trilinear interpolation for volume overlays"
+  echo "-cubic : use cubic interpolation for volume overlays"
   echo "-neuro : use neurological orientation instead of radiological"
   echo "-hide : hide surfaces in 3D"
   echo "-rotate-around-cursor (-rca) : in 3d view, rotate around cursor (use -no- to turn off)"
