@@ -362,17 +362,15 @@ def main():
     # Write affine matrices if needed
     if args.fwd_mat is not None:
         T = Mflo @ np.linalg.inv(Mref)
-        f = open(args.fwd_mat, 'w')
-        for i in range(4):
-            f.write(str(T[i,0]) + ',' + str(T[i,1]) + ',' + str(T[i,2]) + ',' + str(T[i,3]) + '\n')
-        f.close()
+        with open(args.fwd_mat, 'w') as f:
+            for i in range(4):
+                f.write(str(T[i,0]) + ',' + str(T[i,1]) + ',' + str(T[i,2]) + ',' + str(T[i,3]) + '\n')
 
     if args.bak_mat is not None:
         T = Mref @ np.linalg.inv(Mflo)
-        f = open(args.bak_mat, 'w')
-        for i in range(4):
-            f.write(str(T[i,0]) + ',' + str(T[i,1]) + ',' + str(T[i,2]) + ',' + str(T[i,3]) + '\n')
-        f.close()
+        with open(args.bak_mat, 'w') as f:
+            for i in range(4):
+                f.write(str(T[i,0]) + ',' + str(T[i,1]) + ',' + str(T[i,2]) + ',' + str(T[i,3]) + '\n')
 
     print('All done')
     print(' ')
