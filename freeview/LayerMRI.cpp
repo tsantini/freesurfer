@@ -88,6 +88,7 @@
 #include "vtkImageMathematics.h"
 #include "vtkImageExtractComponents.h"
 #include "vtkImageAppendComponents.h"
+#include "vtkImageShiftScale.h"
 #include "Region3D.h"
 #include "LayerPointSet.h"
 #include <QTimer>
@@ -1398,6 +1399,7 @@ void LayerMRI::UpdateDisplayMode()
     }
     if (GetProperty()->GetDisplayRGB())
     {
+      double max_val = GetSourceVolume()->GetMaxValue();
       vtkSmartPointer<vtkImageCast> cast = vtkSmartPointer<vtkImageCast>::New();
       vtkSmartPointer<vtkImageThreshold> upper = vtkSmartPointer<vtkImageThreshold>::New();
       upper->ThresholdByUpper(0);
@@ -1405,14 +1407,32 @@ void LayerMRI::UpdateDisplayMode()
       upper->SetReplaceOut(1);
       upper->SetInputConnection(mReslice[i]->GetOutputPort());
       vtkSmartPointer<vtkImageThreshold> lower = vtkSmartPointer<vtkImageThreshold>::New();
-      lower->ThresholdByLower(255);
-      lower->SetOutValue(255);
-      lower->SetReplaceOut(1);
-      lower->SetInputConnection(upper->GetOutputPort());
-      cast->SetInputConnection(lower->GetOutputPort());
-      cast->SetOutputScalarTypeToUnsignedChar();
-      m_sliceActor2D[i]->GetMapper()->SetInputConnection( cast->GetOutputPort() );
-      m_sliceActor3D[i]->GetMapper()->SetInputConnection( cast->GetOutputPort() );
+      if (max_val < 10)
+      {
+        lower->ThresholdByLower(1);
+        lower->SetOutValue(1);
+        lower->SetReplaceOut(1);
+        lower->SetInputConnection(upper->GetOutputPort());
+        vtkSmartPointer<vtkImageShiftScale> scaler = vtkSmartPointer<vtkImageShiftScale>::New();
+        scaler->SetInputConnection(lower->GetOutputPort());
+        scaler->SetShift(0);
+        scaler->SetScale(255);
+        scaler->SetOutputScalarTypeToUnsignedChar();
+        m_sliceActor2D[i]->GetMapper()->SetInputConnection( scaler->GetOutputPort() );
+        m_sliceActor3D[i]->GetMapper()->SetInputConnection( scaler->GetOutputPort() );
+      }
+      else
+      {
+        lower->ThresholdByLower(255);
+        lower->SetOutValue(255);
+        lower->SetReplaceOut(1);
+        lower->SetInputConnection(upper->GetOutputPort());
+        vtkSmartPointer<vtkImageCast> cast = vtkSmartPointer<vtkImageCast>::New();
+        cast->SetInputConnection(lower->GetOutputPort());
+        cast->SetOutputScalarTypeToUnsignedChar();
+        m_sliceActor2D[i]->GetMapper()->SetInputConnection( cast->GetOutputPort() );
+        m_sliceActor3D[i]->GetMapper()->SetInputConnection( cast->GetOutputPort() );
+      }
     }
     else
     {
