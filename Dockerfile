@@ -9,19 +9,17 @@
 # the FS_LICENSE environment variable to point to it (see commented out COPY and ENV commands below).
 # Then your license file will always be found even if you install/remove other freesurfer distributions.
 
-FROM centos:7
+FROM ubuntu:22.04
 
 # shell settings
 WORKDIR /root
 
 # install utils
-RUN yum -y update
-RUN yum -y install bc libgomp perl tar tcsh wget vim-common
-RUN yum -y install mesa-libGL libXext libSM libXrender libXmu
-RUN yum clean all
+RUN apt update
+RUN apt install -y bc binutils libgomp1 perl psmisc sudo tar tcsh unzip uuid-dev vim-common libjpeg62-dev wget
 
 # install fs
-RUN wget https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.2.0/freesurfer-linux-centos7_x86_64-7.2.0.tar.gz -O fs.tar.gz && \
+RUN wget https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/8.0.0-beta/freesurfer-linux-ubuntu22_x86_64-8.0.0-beta.tar.gz -O fs.tar.gz && \
     tar --no-same-owner -xzvf fs.tar.gz && \
     mv freesurfer /usr/local && \
     rm fs.tar.gz
@@ -40,6 +38,7 @@ ENV LOCAL_DIR /usr/local/freesurfer/local
 ENV FSFAST_HOME /usr/local/freesurfer/fsfast
 ENV FMRI_ANALYSIS_DIR /usr/local/freesurfer/fsfast
 ENV FUNCTIONALS_DIR /usr/local/freesurfer/sessions
+ENV FS_ALLOW_DEEP 1
 
 # set default fs options
 ENV FS_OVERRIDE 0
