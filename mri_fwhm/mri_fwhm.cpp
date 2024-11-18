@@ -1072,7 +1072,7 @@ static void print_usage(void) {
   printf("   --detrend order : polynomial detrending (default 0)\n");
   printf("   --sqr : compute square of input before smoothing\n");
   printf("\n");
-  printf("   --fwhm fwhm : smooth BY fwhm before measuring\n");
+  printf("   --fwhm fwhm : smooth BY fwhm before measuring (--fwhm{crs})\n");
   printf("   --gstd gstd : same as --fwhm but specified as the stddev\n");
   printf("   --median width : perform median filtering instead of gaussian\n");
   printf("   --fwhmc, --fwhmr, --fwhms to control each axis separately\n");
